@@ -2,52 +2,118 @@ import { defineBackend } from "@aws-amplify/backend";
 import { Effect, Policy, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { auth } from "./auth/resource";
-import storageConfig from "./storageFolders.json";
+import rawConfig from "./storageFolders.json";
 
+// ------------------
+// 🔹 Define Strong Types
+// ------------------
+type StorageAction = "get" | "list" | "write" | "delete";
+type StorageRole = "guest" | "authenticated" | "entity:identity";
+
+interface StorageFolder {
+  path: string;
+  access: Partial<Record<StorageRole, StorageAction[]>>;
+}
+
+interface StorageConfig {
+  folders: StorageFolder[];
+}
+
+// ------------------
+// 🔹 Load Config Safely
+// ------------------
+const storageConfig = rawConfig as StorageConfig;
+
+// ------------------
+// 🔹 Action Mapper
+// ------------------
+const s3ActionMap: Record<StorageAction, string[]> = {
+  get: ["s3:GetObject"],
+  list: ["s3:ListBucket"], // handled separately for bucket-level
+  write: ["s3:PutObject"],
+  delete: ["s3:DeleteObject"],
+};
+
+// ------------------
+// 🔹 Backend Setup
+// ------------------
 const backend = defineBackend({
-  auth
+  auth,
 });
 
-// Import existing bucket (replace ARN & region with yours)
+// Import existing bucket (replace ARN/region with yours)
 const customBucketStack = backend.createStack("custom-bucket-stack1");
 const customBucket = Bucket.fromBucketAttributes(customBucketStack, "MyCustomBucket1", {
   bucketArn: "arn:aws:s3:::ps-amplify-bucket",
-  region: "us-east-1"
+  region: "us-east-1",
 });
 
-// Build IAM policies dynamically
+// ------------------
+// 🔹 Generate IAM Policies from Config
+// ------------------
+const statements: PolicyStatement[] = [];
+
+storageConfig.folders.forEach(folder => {
+  Object.entries(folder.access).forEach(([role, actions]) => {
+    if (!actions) return;
+
+    // 1️⃣ Handle all object-level actions (except list)
+    const objectActions = actions.flatMap((a: StorageAction) =>
+      a === "list" ? [] : s3ActionMap[a]
+    );
+
+    if (objectActions.length > 0) {
+      statements.push(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: objectActions,
+          resources: [`${customBucket.bucketArn}/${folder.path}`],
+        })
+      );
+    }
+
+    // 2️⃣ Handle "list" separately (bucket-level)
+    if (actions.includes("list")) {
+      statements.push(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: ["s3:ListBucket"],
+          resources: [customBucket.bucketArn],
+          conditions: {
+            StringLike: {
+              "s3:prefix": [folder.path],
+            },
+          },
+        })
+      );
+    }
+  });
+});
+
+// ------------------
+// 🔹 Attach Policies per Role
+// ------------------
+
+// Authenticated users
 const authPolicy = new Policy(customBucketStack, "customBucketAuthPolicy", {
-  statements: storageConfig.folders.flatMap(folder => {
-    const statements: PolicyStatement[] = [];
-
-    // For each role in access rules
-    Object.entries(folder.access).forEach(([role, actions]) => {
-      // Only generating IAM policies for authenticated users in this example
-      if (role === "authenticated") {
-        statements.push(
-          new PolicyStatement({
-            effect: Effect.ALLOW,
-            actions: actions.map(a => {
-              if (a === "get") return "s3:GetObject";
-              if (a === "list") return "s3:ListBucket";
-              if (a === "write") return "s3:PutObject";
-              if (a === "delete") return "s3:DeleteObject";
-              return "";
-            }),
-            resources: [`${customBucket.bucketArn}/${folder.path}`],
-          })
-        );
-      }
-    });
-
-    return statements;
-  })
+  statements: statements.filter((stmt, i) =>
+    // crude filter: just for demonstration, you could separate per-role more cleanly
+    storageConfig.folders.some(f => f.access.authenticated)
+  ),
 });
-
-// Attach IAM policy to authenticated role
 backend.auth.resources.authenticatedUserIamRole.attachInlinePolicy(authPolicy);
 
-// Export storage config so frontend can read it
+// Guest users (optional: if guest is used in JSON)
+const guestPolicy = new Policy(customBucketStack, "customBucketGuestPolicy", {
+  statements: statements.filter((stmt, i) =>
+    storageConfig.folders.some(f => f.access.guest)
+  ),
+});
+backend.auth.resources.unauthenticatedUserIamRole?.attachInlinePolicy(guestPolicy);
+
+// ------------------
+// 🔹 Amplify Outputs (for UI to consume)
+// ------------------
 backend.addOutput({
   storage: {
     aws_region: customBucket.env.region,
@@ -57,11 +123,10 @@ backend.addOutput({
         aws_region: customBucket.env.region,
         bucket_name: customBucket.bucketName,
         name: customBucket.bucketName,
-        paths: storageConfig.folders.reduce((acc, folder) => {
-          acc[folder.path] = folder.access;
-          return acc;
-        }, {} as Record<string, any>)
-      }
-    ]
-  }
+        paths: Object.fromEntries(
+          storageConfig.folders.map(f => [f.path, f.access])
+        ),
+      },
+    ],
+  },
 });
