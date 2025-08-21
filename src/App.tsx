@@ -9,23 +9,32 @@ import config from '../amplify_outputs.json';
 import { Amplify } from 'aws-amplify';
 import { Authenticator, Button } from '@aws-amplify/ui-react';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { storageFolders, StorageFolder } from '../amplify/storageFolders';
 
 Amplify.configure(config);
 
-async function getResolvedFolders() {
+// Resolve folders dynamically by replacing {entity_id} with actual Cognito Identity ID
+async function getResolvedFolders(): Promise<{ path: string; label: string }[]> {
   const session = await fetchAuthSession();
-  const identityId = session.identityId; // <- Cognito Identity ID
+  const identityId = session.identityId;
 
-  return [
-    { path: 'public/', label: 'Public' },
-    { path: `private/${identityId}/`, label: 'My Private Files' }, // 👈 replaces {entity_id}
-    { path: 'admin/', label: 'Admin Area' },
-  ];
+  return storageFolders.map((folder: StorageFolder) => {
+    const resolvedPath = folder.path.replace('{entity_id}', identityId || 'unknown');
+    const label = resolvedPath.includes('public')
+      ? 'Public'
+      : resolvedPath.includes('private')
+        ? 'My Private Files'
+        : resolvedPath.includes('protected')
+          ? 'Protected'
+          : resolvedPath;
+
+    return { path: resolvedPath, label };
+  });
 }
 
 const { StorageBrowser } = createStorageBrowser({
   config: createAmplifyAuthAdapter(),
-  getFolders: getResolvedFolders, // 👈 forces resolved folders
+  getFolders: getResolvedFolders, // dynamically resolves folders
 });
 
 function App() {

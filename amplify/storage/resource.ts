@@ -1,39 +1,34 @@
-import { defineStorage } from '@aws-amplify/backend';
+import { defineStorage } from "@aws-amplify/backend";
+import { storageFolders, FilePerm } from "../storageFolders";
 
 export const storage = defineStorage({
-  name: 'myStorageBucket',
-  isDefault: true,
-   access: (allow) => ({
-    'public/*': [
-        allow.guest.to(['read', 'write']),
-        allow.authenticated.to(['read', 'write', 'delete']),
-    ],
-    'admin/*': [
-        allow.groups(['admin']).to(['read', 'write', 'delete']),
-        allow.authenticated.to(['read'])
-    ],
-    'private/{entity_id}/*': [
-        allow.entity('identity').to(['read', 'write', 'delete'])
-    ]
-   })
+    name: "myStorageBucket",
+    isDefault: true,
+    access: (allow) => {
+        const rules: Record<string, any[]> = {};
+
+        for (const folder of storageFolders) {
+            const actions: any[] = [];
+
+            for (const [role, perms] of Object.entries(folder.access)) {
+                const typedPerms = perms as FilePerm[]; // ✅ cast to proper literal type
+
+                if (role === "guest") {
+                    actions.push(allow.guest.to(typedPerms));
+                } else if (role === "authenticated") {
+                    actions.push(allow.authenticated.to(typedPerms));
+                } else if (role.startsWith("groups:")) {
+                    const groupName = role.split(":")[1];
+                    actions.push(allow.groups([groupName]).to(typedPerms));
+                } else if (role.startsWith("entity:")) {
+                    const entity = role.split(":")[1] as "identity";
+                    actions.push(allow.entity(entity).to(typedPerms));
+                }
+            }
+
+            rules[folder.path] = actions;
+        }
+
+        return rules;
+    },
 });
-
-export const secondaryStorage = defineStorage({
-  name: 'mySecondaryStorageBucket',
-   access: (allow) => ({
-    'backup_public/*': [
-        allow.guest.to(['read', 'write']),
-        allow.authenticated.to(['read', 'write', 'delete']),
-    ],
-    'backup_admin/*': [
-        allow.groups(['admin']).to(['read', 'write', 'delete']),
-        allow.authenticated.to(['read'])
-    ],
-    'backup_private/{entity_id}/*': [
-        allow.entity('identity').to(['read', 'write', 'delete'])
-    ]
-   })
-});
-
-
-
