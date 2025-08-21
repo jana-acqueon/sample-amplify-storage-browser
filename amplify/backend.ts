@@ -2,7 +2,8 @@ import { defineBackend } from "@aws-amplify/backend";
 import { Effect, Policy, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { auth } from "./auth/resource";
-import rawConfig from "./storageFolders.json";
+import { storageFolders } from "./storageFolders";
+
 
 // ------------------
 // 🔹 Define Strong Types
@@ -22,7 +23,7 @@ interface StorageConfig {
 // ------------------
 // 🔹 Load Config Safely
 // ------------------
-const storageConfig = rawConfig as StorageConfig;
+const storageConfig = storageFolders as StorageConfig;
 
 // ------------------
 // 🔹 Action Mapper
