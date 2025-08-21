@@ -15,26 +15,27 @@ export interface StorageFolder {
   access: FolderAccess;
 }
 
-// Export folders dynamically
-export const storageFolders: StorageFolder[] = [
-  {
-    path: "public/*",
-    access: {
-      guest: ["get", "list"],
-      authenticated: ["get", "list", "write", "delete"],
+export const storageFolders = {
+  folders: [
+    {
+      path: "public/*",
+      access: {
+        guest: ["read", "write", "delete"],
+        authenticated: ["read", "write", "delete"],
+      },
     },
-  },
-  {
-    path: "protected/{entity_id}/*",
-    access: {
-      authenticated: ["get", "list"],
-      "entity:identity": ["get", "list", "write", "delete"],
+    {
+      path: "protected/{entity_id}/*",
+      access: {
+        authenticated: ["read", "list"],
+        "entity:identity": ["read", "list", "write", "delete"],
+      },
     },
-  },
-  {
-    path: "private/{entity_id}/*",
-    access: {
-      "entity:identity": ["get", "list", "write", "delete"],
+    {
+      path: "private/{entity_id}/*",
+      access: {
+        "entity:identity": ["read", "list", "write", "delete"],
+      },
     },
-  },
-];
+  ],
+};

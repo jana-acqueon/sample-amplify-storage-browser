@@ -9,33 +9,33 @@ import config from '../amplify_outputs.json';
 import { Amplify } from 'aws-amplify';
 import { Authenticator, Button } from '@aws-amplify/ui-react';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { storageFolders, StorageFolder } from '../amplify/storageFolders';
+import { storageFolders } from '../amplify/storageFolders';
 
 Amplify.configure(config);
 
-// Resolve folders dynamically by replacing {entity_id} with actual Cognito Identity ID
-async function getResolvedFolders(): Promise<{ path: string; label: string }[]> {
-  const session = await fetchAuthSession();
-  const identityId = session.identityId;
-
-  return storageFolders.map((folder: StorageFolder) => {
-    const resolvedPath = folder.path.replace('{entity_id}', identityId || 'unknown');
-    const label = resolvedPath.includes('public')
-      ? 'Public'
-      : resolvedPath.includes('private')
-        ? 'My Private Files'
-        : resolvedPath.includes('protected')
-          ? 'Protected'
-          : resolvedPath;
-
-    return { path: resolvedPath, label };
-  });
-}
-
 const { StorageBrowser } = createStorageBrowser({
   config: createAmplifyAuthAdapter(),
-  getFolders: getResolvedFolders, // dynamically resolves folders
+  getFolders: async () => {
+    const session = await fetchAuthSession();
+    const identityId = session.identityId ?? "unknown"; // fallback if undefined
+
+    return storageFolders.folders.map((folder) => {
+      let path = folder.path;
+      if (path.includes("{entity_id}")) {
+        path = path.replace("{entity_id}", identityId);
+      }
+
+      // Friendly label for UI
+      let label = path;
+      if (path.startsWith("private/")) label = "My Private Files";
+      else if (path.startsWith("public/")) label = "Public";
+      else if (path.startsWith("protected/")) label = "Protected";
+
+      return { path, label };
+    });
+  },
 });
+
 
 function App() {
   return (
