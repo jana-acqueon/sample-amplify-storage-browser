@@ -9,11 +9,11 @@ const backend = defineBackend({
 });
 
 
-const customBucketStack = backend.createStack("custom-bucket-stack");
+const customBucketStack = backend.createStack("custom-bucket-stack1");
 
 // Import existing bucket
-const customBucket = Bucket.fromBucketAttributes(customBucketStack, "MyCustomBucket", {
-  bucketArn: "arn:aws:s3:::ps-amplify-bucket ",
+const customBucket = Bucket.fromBucketAttributes(customBucketStack, "MyCustomBucket1", {
+  bucketArn: "arn:aws:s3:::ps-amplify-bucket",
   region: "us-east-1"
 });
 
