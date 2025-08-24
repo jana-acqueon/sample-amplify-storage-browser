@@ -22,7 +22,7 @@ const { StorageBrowser } = createStorageBrowser({
   config: createAmplifyAuthAdapter(),
 });
 
-// Custom Auth Header (branded login page)
+// Custom Auth Header (for login page)
 function CustomAuthHeader() {
   return (
     <View textAlign="center" padding="medium">
@@ -44,7 +44,7 @@ const customTheme = {
       brand: {
         primary: {
           10: '#F0F6FF',
-          80: '#1E40AF', // main brand blue
+          80: '#1E40AF',
           90: '#1D4ED8',
           100: '#1E3A8A',
         },
@@ -68,56 +68,63 @@ const customTheme = {
 function App() {
   return (
     <ThemeProvider theme={customTheme} colorMode="light">
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-indigo-600 flex items-center justify-center">
-        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <Authenticator
-            hideSignUp={true}
-            components={{
-              Header: CustomAuthHeader,
-            }}
-          >
-            {({ signOut, user }) => (
-              <div className="min-h-screen flex flex-col bg-gray-50">
-                {/* Header */}
-                <header className="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div className="min-h-screen bg-gray-100 flex">
+        <Authenticator
+          hideSignUp={true}
+          components={{
+            Header: CustomAuthHeader,
+          }}
+        >
+          {({ signOut, user }) => (
+            <div className="flex flex-col w-full min-h-screen">
+              {/* Professional Header */}
+              <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+                  {/* Logo + App Name */}
                   <div className="flex items-center gap-3">
                     <img
                       src="https://acqueon.com/wp-content/uploads/2025/04/Acqueon-Logo.svg"
                       alt="Acqueon Logo"
                       className="h-10"
                     />
-                    <h1 className="text-xl font-semibold text-gray-800">
-                      Client Storage Portal
-                    </h1>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-gray-600">
-                      {`Hello, ${user?.username}`}
+                    <span className="text-lg font-semibold text-gray-800">
+                      File Storage Portal
                     </span>
-                    <Button size="small" variation="primary" onClick={signOut}>
+                  </div>
+
+                  {/* Right: User + Sign Out */}
+                  <div className="flex items-center gap-4">
+                    <span className="text-gray-700 font-medium">
+                      {user?.username}
+                    </span>
+                    <Button
+                      size="small"
+                      variation="primary"
+                      onClick={signOut}
+                    >
                       Sign out
                     </Button>
                   </div>
-                </header>
+                </div>
+              </header>
 
-                {/* Main Content */}
-                <main className="flex-1 flex p-6">
-                  <div className="w-full bg-white rounded-2xl shadow-md p-6">
-                    <Heading level={4} className="mb-4 text-gray-700">
-                      File Storage
-                    </Heading>
-                    <StorageBrowser />
-                  </div>
-                </main>
+              {/* Main Content */}
+              <main className="flex-1 max-w-7xl mx-auto w-full p-6">
+                <div className="bg-white rounded-xl shadow-md p-6">
+                  <Heading level={4} className="mb-4 text-gray-700">
+                    File Storage
+                  </Heading>
+                  <StorageBrowser />
+                </div>
+              </main>
 
-                {/* Footer */}
-                <footer className="bg-gray-100 text-center text-sm text-gray-500 py-4">
-                  © {new Date().getFullYear()} Acqueon. All rights reserved.
-                </footer>
-              </div>
-            )}
-          </Authenticator>
-        </div>
+              {/* Footer */}
+              <footer className="bg-white border-t border-gray-200 text-center text-sm text-gray-500 py-4">
+                © {new Date().getFullYear()} Acqueon. All rights reserved.
+              </footer>
+            </div>
+          )}
+        </Authenticator>
       </div>
     </ThemeProvider>
   );
