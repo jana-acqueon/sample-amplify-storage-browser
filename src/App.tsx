@@ -7,26 +7,111 @@ import './App.css';
 
 import config from '../amplify_outputs.json';
 import { Amplify } from 'aws-amplify';
-import { Authenticator, Button } from '@aws-amplify/ui-react';
+import {
+  Authenticator,
+  Button,
+  Heading,
+  Image,
+  Text,
+  View,
+  ThemeProvider,
+} from '@aws-amplify/ui-react';
+
 Amplify.configure(config);
 
 const { StorageBrowser } = createStorageBrowser({
   config: createAmplifyAuthAdapter(),
 });
 
+// Custom Auth Header (Login page branding)
+function CustomAuthHeader() {
+  return (
+    <View textAlign="center" padding="medium">
+      <Image alt="logo" src="/logo.png" height="60px" className="mx-auto mb-4" />
+      <Heading level={3} className="text-gray-800">
+        Welcome to Client Storage Portal
+      </Heading>
+      <Text variation="tertiary" className="text-gray-500">
+        Secure access to your files
+      </Text>
+    </View>
+  );
+}
+
+// Custom theme (brand colors, rounded buttons, etc.)
+const customTheme = {
+  name: 'custom-theme',
+  tokens: {
+    colors: {
+      brand: {
+        primary: {
+          10: '#F0F6FF',
+          80: '#1E40AF', // main brand blue
+          90: '#1D4ED8',
+          100: '#1E3A8A',
+        },
+      },
+    },
+    components: {
+      button: {
+        primary: {
+          backgroundColor: '{colors.brand.primary.80}',
+          _hover: { backgroundColor: '{colors.brand.primary.90}' },
+        },
+      },
+    },
+    radii: {
+      small: '8px',
+      medium: '12px',
+    },
+  },
+};
+
 function App() {
   return (
-    <Authenticator hideSignUp={true}>
-      {({ signOut, user }) => (
-        <>
-          <div className="header">
-            <h1>{`Hello ${user?.username}`}</h1>
-            <Button onClick={signOut}>Sign out</Button>
+    <ThemeProvider theme={customTheme} colorMode="light">
+      <Authenticator
+        hideSignUp={true}
+        components={{
+          Header: CustomAuthHeader,
+        }}
+      >
+        {({ signOut, user }) => (
+          <div className="min-h-screen flex flex-col bg-gray-50">
+            {/* Header */}
+            <header className="bg-white shadow-md flex items-center justify-between px-6 py-4">
+              <div className="flex items-center gap-3">
+                <img src="/logo.png" alt="Logo" className="h-10" />
+                <h1 className="text-xl font-semibold text-gray-800">
+                  Client Storage Portal
+                </h1>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-gray-600">{`Hello, ${user?.username}`}</span>
+                <Button size="small" variation="primary" onClick={signOut}>
+                  Sign out
+                </Button>
+              </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="flex-1 flex p-6">
+              <div className="w-full bg-white rounded-2xl shadow-md p-6">
+                <Heading level={4} className="mb-4 text-gray-700">
+                  File Storage
+                </Heading>
+                <StorageBrowser />
+              </div>
+            </main>
+
+            {/* Footer */}
+            <footer className="bg-gray-100 text-center text-sm text-gray-500 py-4">
+              © {new Date().getFullYear()} Your Company. All rights reserved.
+            </footer>
           </div>
-          <StorageBrowser />
-        </>
-      )}
-    </Authenticator>
+        )}
+      </Authenticator>
+    </ThemeProvider>
   );
 }
 
