@@ -12,7 +12,6 @@ import {
   Button,
   Heading,
   Image,
-  Text,
   View,
   ThemeProvider,
 } from '@aws-amplify/ui-react';
