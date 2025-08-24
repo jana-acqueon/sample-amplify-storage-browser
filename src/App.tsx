@@ -18,7 +18,7 @@ import {
 } from '@aws-amplify/ui-react';
 
 // ✅ Import assets from src/assets/
-import logoPng from './assets/logo.png';
+import logoPng from './assets/Logo.png';
 import logoSvg from './assets/logo.svg';
 import neonVideo from './assets/NeonBlueLogoAnimation.mp4';
 import orangeVideo from './assets/OrangeLogoAnimation.mp4';
@@ -79,13 +79,7 @@ function App() {
     <ThemeProvider theme={customTheme} colorMode="light">
       {/* Background Video Layer */}
       <div className="relative min-h-screen w-full overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute top-0 left-0 w-full h-full object-cover"
-        >
+        <video autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover" >
           <source src={neonVideo} type="video/mp4" />
           <source src={orangeVideo} type="video/mp4" />
           <source src={royalVideo} type="video/mp4" />
