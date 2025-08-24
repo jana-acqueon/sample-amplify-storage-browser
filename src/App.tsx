@@ -14,7 +14,7 @@ import {
   ThemeProvider,
 } from '@aws-amplify/ui-react';
 
-import logoPng from './assets/logo.png';
+import logoPng from './assets/Logo.png';
 
 // Background videos
 import neonVideo from './assets/NeonBlueLogoAnimation.mp4';
