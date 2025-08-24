@@ -26,7 +26,12 @@ const { StorageBrowser } = createStorageBrowser({
 function CustomAuthHeader() {
   return (
     <View textAlign="center" padding="medium">
-      <Image alt="logo" src="https://acqueon.com/wp-content/uploads/2025/04/Acqueon-Logo.svg" height="60px" className="mx-auto mb-4" />
+      <Image
+        alt="Acqueon Logo"
+        src="https://acqueon.com/wp-content/uploads/2025/04/Acqueon-Logo.svg"
+        height="60px"
+        className="mx-auto mb-4"
+      />
     </View>
   );
 }
@@ -64,7 +69,7 @@ function App() {
   return (
     <ThemeProvider theme={customTheme} colorMode="light">
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-indigo-600 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden">
           <Authenticator
             hideSignUp={true}
             components={{
@@ -76,13 +81,19 @@ function App() {
                 {/* Header */}
                 <header className="bg-white shadow-md flex items-center justify-between px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="Logo" className="h-10" />
+                    <img
+                      src="https://acqueon.com/wp-content/uploads/2025/04/Acqueon-Logo.svg"
+                      alt="Acqueon Logo"
+                      className="h-10"
+                    />
                     <h1 className="text-xl font-semibold text-gray-800">
                       Client Storage Portal
                     </h1>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-gray-600">{`Hello, ${user?.username}`}</span>
+                    <span className="text-gray-600">
+                      {`Hello, ${user?.username}`}
+                    </span>
                     <Button size="small" variation="primary" onClick={signOut}>
                       Sign out
                     </Button>
