@@ -22,7 +22,7 @@ const { StorageBrowser } = createStorageBrowser({
   config: createAmplifyAuthAdapter(),
 });
 
-// Custom Auth Header (for login page)
+// Custom Auth Header (login page)
 function CustomAuthHeader() {
   return (
     <View textAlign="center" padding="medium">
@@ -36,14 +36,13 @@ function CustomAuthHeader() {
   );
 }
 
-// Custom theme (brand colors, rounded buttons, etc.)
+// Theme (brand colors, rounded buttons, etc.)
 const customTheme = {
   name: 'custom-theme',
   tokens: {
     colors: {
       brand: {
         primary: {
-          10: '#F0F6FF',
           80: '#1E40AF',
           90: '#1D4ED8',
           100: '#1E3A8A',
@@ -59,8 +58,8 @@ const customTheme = {
       },
     },
     radii: {
-      small: '8px',
-      medium: '12px',
+      small: '6px',
+      medium: '10px',
     },
   },
 };
@@ -77,10 +76,10 @@ function App() {
         >
           {({ signOut, user }) => (
             <div className="flex flex-col w-full min-h-screen">
-              {/* Professional Header */}
-              <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-                  {/* Logo + App Name */}
+              {/* Header Panel */}
+              <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+                <div className="flex items-center justify-between max-w-7xl mx-auto px-6 py-3">
+                  {/* Left: Logo + Title */}
                   <div className="flex items-center gap-3">
                     <img
                       src="https://acqueon.com/wp-content/uploads/2025/04/Acqueon-Logo.svg"
@@ -97,11 +96,7 @@ function App() {
                     <span className="text-gray-700 font-medium">
                       {user?.username}
                     </span>
-                    <Button
-                      size="small"
-                      variation="primary"
-                      onClick={signOut}
-                    >
+                    <Button size="small" variation="primary" onClick={signOut}>
                       Sign out
                     </Button>
                   </div>
