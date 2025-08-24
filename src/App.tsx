@@ -36,7 +36,7 @@ function CustomAuthHeader() {
   );
 }
 
-// Theme (brand colors, rounded buttons, etc.)
+// Custom theme (brand colors)
 const customTheme = {
   name: 'custom-theme',
   tokens: {
@@ -67,35 +67,31 @@ const customTheme = {
 function App() {
   return (
     <ThemeProvider theme={customTheme} colorMode="light">
-      <div className="min-h-screen bg-gray-100 flex">
+      <div className="min-h-screen bg-gray-100 flex flex-col">
         <Authenticator
           hideSignUp={true}
-          components={{
-            Header: CustomAuthHeader,
-          }}
+          components={{ Header: CustomAuthHeader }}
         >
           {({ signOut, user }) => (
-            <div className="flex flex-col w-full min-h-screen">
-              {/* Header Panel */}
-              <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-                <div className="flex items-center justify-between max-w-7xl mx-auto px-6 py-3">
-                  {/* Left: Logo + Title */}
-                  <div className="flex items-center gap-3">
+            <div className="flex flex-col flex-1 w-full min-h-screen">
+              {/* Boxy Admin Header */}
+              <header className="bg-white shadow-md rounded-b-xl border-b border-gray-300 sticky top-0 z-50">
+                <div className="w-full flex items-center justify-between px-8 py-4">
+                  {/* Left: Logo + Portal Title */}
+                  <div className="flex items-center gap-4">
                     <img
                       src="https://acqueon.com/wp-content/uploads/2025/04/Acqueon-Logo.svg"
                       alt="Acqueon Logo"
-                      className="h-10"
+                      className="h-12"
                     />
-                    <span className="text-lg font-semibold text-gray-800">
+                    <span className="text-xl font-semibold text-gray-800">
                       File Storage Portal
                     </span>
                   </div>
 
-                  {/* Right: User + Sign Out */}
+                  {/* Right: Username + Sign Out */}
                   <div className="flex items-center gap-4">
-                    <span className="text-gray-700 font-medium">
-                      {user?.username}
-                    </span>
+                    <span className="text-gray-700 font-medium">{user?.username}</span>
                     <Button size="small" variation="primary" onClick={signOut}>
                       Sign out
                     </Button>
@@ -104,8 +100,8 @@ function App() {
               </header>
 
               {/* Main Content */}
-              <main className="flex-1 max-w-7xl mx-auto w-full p-6">
-                <div className="bg-white rounded-xl shadow-md p-6">
+              <main className="flex-1 w-full flex justify-center items-start p-6">
+                <div className="w-full max-w-4xl bg-white rounded-xl shadow-md p-6">
                   <Heading level={4} className="mb-4 text-gray-700">
                     File Storage
                   </Heading>
