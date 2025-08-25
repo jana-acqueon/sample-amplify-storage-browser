@@ -10,7 +10,6 @@ import { Amplify } from 'aws-amplify';
 import {
   Authenticator,
   Button,
-  Heading,
   Image,
   View,
   ThemeProvider,
