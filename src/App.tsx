@@ -70,8 +70,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 flex flex-col">
         <Authenticator
           hideSignUp={true}
-          components={{ Header: CustomAuthHeader }}
-        >
+          components={{ Header: CustomAuthHeader }}>
           {({ signOut, user }) => (
             <div className="flex flex-col flex-1 w-full min-h-screen">
               {/* Boxy Admin Header */}
@@ -84,14 +83,11 @@ function App() {
                       alt="Acqueon Logo"
                       className="h-12"
                     />
-                    <span className="text-xl font-semibold text-gray-800">
-                      File Storage Portal
-                    </span>
                   </div>
 
                   {/* Right: Username + Sign Out */}
                   <div className="flex items-center gap-4">
-                    <span className="text-gray-700 font-medium">{user?.username}</span>
+                    <span className="text-gray-700 font-medium">{user?.signInDetails?.loginId}</span>
                     <Button size="small" variation="primary" onClick={signOut}>
                       Sign out
                     </Button>
@@ -102,9 +98,9 @@ function App() {
               {/* Main Content */}
               <main className="flex-1 w-full flex justify-center items-start p-6">
                 <div className="w-full max-w-4xl bg-white rounded-xl shadow-md p-6">
-                  <Heading level={4} className="mb-4 text-gray-700">
+                  {/* <Heading level={4} className="mb-4 text-gray-700">
                     File Storage
-                  </Heading>
+                  </Heading> */}
                   <StorageBrowser />
                 </div>
               </main>
